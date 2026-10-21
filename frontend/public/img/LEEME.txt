@@ -1,0 +1,13 @@
+Ponga aquí las imágenes de la universidad con ESTOS nombres exactos:
+
+  escudo.png              -> el escudo / logo (fondo transparente si es posible)
+  sello-acreditacion.png  -> sello de acreditación (fondo transparente)
+  campus-1.jpg            -> foto del campus (horizontal, idealmente 1600 px de ancho o más)
+  campus-2.jpg            -> otra foto (opcional)
+  campus-3.jpg            -> otra foto (opcional)
+
+Si falta alguna, la página no se daña: sin fotos muestra un fondo rojo con
+líneas de montaña, y sin escudo muestra "UP" y sin sello dibuja uno sencillo.
+
+Para cambiar la lista de fotos: src/app/pages/login/login.ts -> FOTOS_CAMPUS
+contornos.svg es la textura de fondo, no la borren.

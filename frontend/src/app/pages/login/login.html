@@ -1,0 +1,111 @@
+<main class="pantalla">
+  <!-- Lado izquierdo: fotos del campus + mensaje institucional -->
+  <section class="portada" aria-label="Universidad de Pamplona">
+    <div class="fondo" aria-hidden="true">
+      @for (foto of fotos(); track foto.src; let i = $index) {
+        <div
+          class="foto"
+          [class.activa]="i === fotoActual()"
+          [style.background-image]="'url(' + foto.src + ')'"
+          [style.background-position]="foto.encuadre"
+        ></div>
+      }
+    </div>
+
+    <div class="portada-contenido">
+      <app-escudo />
+
+      <div class="mensaje">
+        <h2>Trabajo social estudiantil</h2>
+        <p class="lema">
+          Formando nuevas generaciones con sello de excelencia, comprometidos con la
+          transformación social de las regiones y un país en paz.
+        </p>
+      </div>
+
+      <div class="acreditacion">
+        @if (!selloFallo()) {
+          <img class="sello-img" src="img/sello-acreditacion.png" alt="" (error)="selloFallo.set(true)" />
+        } @else {
+          <svg class="sello" viewBox="0 0 100 100" aria-hidden="true">
+            <defs>
+              <path id="arco-sello" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0" />
+            </defs>
+            <circle cx="50" cy="50" r="47" class="aro" />
+            <circle cx="50" cy="50" r="29" class="aro-fino" />
+            <text class="texto-sello">
+              <textPath href="#arco-sello" textLength="228" lengthAdjust="spacing">ACREDITADA EN ALTA CALIDAD · MULTICAMPUS ·</textPath>
+            </text>
+            <path class="estrella" d="M50 34 l4.7 9.6 10.6 1.5 -7.7 7.5 1.8 10.5 -9.4-5 -9.4 5 1.8-10.5 -7.7-7.5 10.6-1.5z" />
+          </svg>
+        }
+        <p>
+          <strong>Acreditada institucionalmente en alta calidad</strong>
+          <span>25 programas acreditados</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lado derecho: formulario -->
+  <section class="acceso">
+    <div class="formulario">
+      <h1>Inicia sesión</h1>
+      <p class="sub">Usa tu correo institucional para entrar al sistema de trabajo social.</p>
+
+      <form [formGroup]="form" (ngSubmit)="entrar()" novalidate>
+        <label for="correo">Correo institucional</label>
+        <input
+          id="correo"
+          type="email"
+          formControlName="correo"
+          placeholder="nombre@unipamplona.edu.co"
+          autocomplete="username"
+          [class.invalido]="tieneError('correo', 'required') || tieneError('correo', 'email')"
+        />
+        @if (tieneError('correo', 'required')) {
+          <small class="msg">Escribe tu correo.</small>
+        } @else if (tieneError('correo', 'email')) {
+          <small class="msg">Revisa el correo: debe verse como nombre&#64;unipamplona.edu.co</small>
+        }
+
+        <label for="password">Contraseña</label>
+        <div class="con-boton">
+          <input
+            id="password"
+            [type]="verPassword() ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="current-password"
+            [class.invalido]="tieneError('password', 'required')"
+          />
+          <button
+            type="button"
+            class="ver"
+            (click)="verPassword.set(!verPassword())"
+            [attr.aria-pressed]="verPassword()"
+          >
+            {{ verPassword() ? 'Ocultar' : 'Mostrar' }}
+          </button>
+        </div>
+        @if (tieneError('password', 'required')) {
+          <small class="msg">Escribe tu contraseña.</small>
+        } @else {
+          <small class="ayuda">La primera vez, tu contraseña es tu número de cédula.</small>
+        }
+
+        @if (error()) {
+          <div class="alerta" role="alert">{{ error() }}</div>
+        }
+
+        <button type="submit" class="principal" [disabled]="cargando()">
+          {{ cargando() ? 'Iniciando sesión…' : 'Iniciar sesión' }}
+        </button>
+      </form>
+    </div>
+
+    <footer class="pie">
+      <span>Universidad de Pamplona</span>
+      <span>Km 1 vía Bucaramanga, Ciudad Universitaria, Pamplona, Norte de Santander</span>
+    </footer>
+  </section>
+</main>

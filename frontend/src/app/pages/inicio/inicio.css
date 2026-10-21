@@ -1,0 +1,129 @@
+.barra {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 24px;
+  background: var(--primario);
+  border-bottom: 4px solid var(--dorado);
+  color: #fff;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sistema {
+  font-weight: 600;
+  padding-left: 12px;
+  border-left: 1px solid rgb(255 255 255 / 0.4);
+}
+
+
+
+.barra button {
+  border: 1px solid rgb(255 255 255 / 0.4);
+  background: transparent;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.barra button:hover {
+  background: rgb(255 255 255 / 0.1);
+}
+
+.contenido {
+  max-width: 640px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+
+h1 {
+  margin: 0;
+  color: var(--azul);
+}
+
+
+.datos {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 20px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-left: 4px solid var(--primario);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin: 24px 0;
+}
+
+dt {
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+
+/* Aviso grande con el rol */
+.aviso-rol {
+  --color-rol: var(--primario);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-rol) 9%, #fff);
+  border: 1px solid color-mix(in srgb, var(--color-rol) 28%, #fff);
+  color: var(--color-rol);
+}
+
+.aviso-rol.docente {
+  --color-rol: var(--azul);
+}
+
+.aviso-rol p {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.aviso-rol strong {
+  font-weight: 800;
+}
+
+.icono {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--color-rol);
+}
+
+.icono svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
+@media (max-width: 600px) {
+  .barra {
+    padding: 10px 16px;
+  }
+  .sistema {
+    display: none;
+  }
+}

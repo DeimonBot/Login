@@ -1,0 +1,35 @@
+<header class="barra">
+  <div class="marca">
+    <app-escudo tamano="pequeno" />
+    <span class="sistema">Trabajo social</span>
+  </div>
+  <button type="button" (click)="salir()">Cerrar sesión</button>
+</header>
+
+<main class="contenido">
+  @if (usuario(); as u) {
+    <div class="aviso-rol" [class.docente]="esDocente()" role="status">
+      <span class="icono" aria-hidden="true">
+        @if (esDocente()) {
+          <!-- pizarra -->
+          <svg viewBox="0 0 24 24"><path d="M3 4h18v12H3z M8 20l2-4 M16 20l-2-4 M7 9h6 M7 12h9" /></svg>
+        } @else {
+          <!-- birrete -->
+          <svg viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5 M22 9v6" /></svg>
+        }
+      </span>
+      <p>Ingresaste como <strong>{{ nombreRol() }}</strong></p>
+    </div>
+
+    <h1>¡Hola, {{ u.nombre }}!</h1>
+
+    <dl class="datos">
+      <dt>Correo</dt>
+      <dd>{{ u.correo }}</dd>
+      @if (!esDocente()) {
+        <dt>Carrera</dt>
+        <dd>{{ u.carrera || '—' }}</dd>
+      }
+    </dl>
+  }
+</main>

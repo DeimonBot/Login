@@ -1,0 +1,382 @@
+/* ============ Estructura: portada (izquierda) + acceso (derecha) ============ */
+.pantalla {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(380px, 1fr);
+  background: var(--superficie);
+}
+
+/* ============ Portada ============ */
+.portada {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background: var(--primario-oscuro);
+}
+
+.fondo,
+.fondo::before,
+.fondo::after,
+.foto {
+  position: absolute;
+  inset: 0;
+}
+
+/* Textura de contornos de montaña (siempre presente, debajo de las fotos) */
+.fondo {
+  background:
+    url('/img/contornos.svg') center / cover no-repeat,
+    radial-gradient(120% 90% at 15% 10%, #c13d3d 0%, var(--primario) 35%, var(--primario-oscuro) 100%);
+}
+
+.foto {
+  background-size: cover;
+  opacity: 0;
+  transform: scale(1.06);
+  transition:
+    opacity 1.2s ease,
+    transform 6s ease-out;
+}
+
+.foto.activa {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Capa roja sobre las fotos para que el texto blanco se lea */
+.fondo::after {
+  content: '';
+  z-index: 1;
+  background:
+    linear-gradient(to top, rgb(94 26 26 / 0.95) 0%, rgb(140 38 38 / 0.72) 45%, rgb(94 26 26 / 0.3) 100%),
+    linear-gradient(to right, rgb(94 26 26 / 0.35), transparent 60%);
+}
+
+.portada-contenido {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 36px clamp(24px, 5vw, 64px) 44px;
+}
+
+.mensaje {
+  max-width: 34rem;
+  text-shadow: 0 1px 14px rgb(40 8 8 / 0.35);
+  animation: aparecer 0.9s ease both 0.15s;
+}
+
+.mensaje h2 {
+  margin: 0;
+  font-size: clamp(2.2rem, 4.2vw, 3.6rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.lema {
+  margin: 20px 0 0;
+  max-width: 30rem;
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  line-height: 1.55;
+  color: rgb(255 255 255 / 0.88);
+}
+
+/* Sello de acreditación */
+.acreditacion {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sello-img {
+  width: 132px;
+  height: auto;
+  flex: none;
+  filter: drop-shadow(0 6px 18px rgb(30 6 6 / 0.45));
+}
+
+.sello {
+  width: 84px;
+  height: 84px;
+  flex: none;
+}
+
+.sello .aro {
+  fill: rgb(94 26 26 / 0.55);
+  stroke: var(--dorado);
+  stroke-width: 2.5;
+}
+
+.sello .aro-fino {
+  fill: none;
+  stroke: var(--dorado);
+  stroke-width: 1;
+}
+
+.sello .texto-sello {
+  fill: var(--dorado);
+  font-size: 7.4px;
+  font-weight: 700;
+}
+
+.sello .estrella {
+  fill: var(--dorado);
+}
+
+.acreditacion p {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.95rem;
+}
+
+.acreditacion span {
+  color: rgb(255 255 255 / 0.8);
+  font-size: 0.875rem;
+}
+
+/* ============ Acceso (formulario) ============ */
+.acceso {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px clamp(24px, 5vw, 72px) 28px;
+}
+
+.formulario {
+  width: 100%;
+  max-width: 380px;
+  margin: auto 0;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--azul);
+  letter-spacing: -0.01em;
+}
+
+.sub {
+  margin: 8px 0 28px;
+  color: var(--texto-suave);
+  line-height: 1.5;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 18px 0 7px;
+}
+
+label:first-of-type {
+  margin-top: 0;
+}
+
+input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--borde);
+  border-radius: 8px;
+  font: inherit;
+  color: var(--texto);
+  background: #fafafa;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+
+input::placeholder {
+  color: #9a9a9a;
+}
+
+input:hover {
+  border-color: #bdbdbd;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--azul);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgb(0 51 102 / 0.15);
+}
+
+input.invalido {
+  border-color: var(--error);
+}
+
+.con-boton {
+  position: relative;
+}
+
+.con-boton input {
+  padding-right: 92px;
+}
+
+.ver {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--azul);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 10px;
+}
+
+.ver:hover {
+  background: rgb(0 51 102 / 0.07);
+}
+
+.ver:focus-visible,
+.principal:focus-visible {
+  outline: 3px solid rgb(0 51 102 / 0.35);
+  outline-offset: 2px;
+}
+
+.msg,
+.ayuda {
+  margin-top: 6px;
+  font-size: 0.82rem;
+}
+
+.msg {
+  color: var(--error);
+}
+
+.ayuda {
+  color: var(--texto-suave);
+}
+
+.alerta {
+  margin-top: 20px;
+  padding: 11px 14px;
+  border-left: 4px solid var(--error);
+  border-radius: 6px;
+  background: #fdf0f0;
+  color: #7f1d1d;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.principal {
+  margin-top: 28px;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: var(--primario);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.principal:hover:not(:disabled) {
+  background: var(--primario-hover);
+}
+
+.principal:disabled {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.pie {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.78rem;
+  color: #8a8a8a;
+}
+
+.pie span:first-child {
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+/* ============ Animación de entrada (una sola) ============ */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mensaje {
+    animation: none;
+  }
+  .foto {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* ============ Tablet / celular: la portada pasa arriba ============ */
+@media (max-width: 860px) {
+  .pantalla {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .portada-contenido {
+    padding: 20px 16px 24px;
+    gap: 28px;
+  }
+
+  .mensaje h2 {
+    font-size: 1.9rem;
+  }
+
+  .lema {
+    display: none;
+  }
+
+  .sello {
+    width: 56px;
+    height: 56px;
+  }
+
+  .sello-img {
+    width: 76px;
+  }
+
+  .acreditacion p {
+    font-size: 0.85rem;
+  }
+
+  .acreditacion span {
+    font-size: 0.8rem;
+  }
+
+  .acceso {
+    padding: 32px 16px 24px;
+  }
+
+  .formulario {
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+}

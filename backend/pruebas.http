@@ -1,0 +1,26 @@
+### Pruebas rápidas del login sin abrir Angular.
+### En IntelliJ o VS Code (extensión "REST Client") aparece un botón "Send Request" encima de cada una.
+
+### 1) Login de ESTUDIANTE -> 200 con "rol": "ESTUDIANTE"
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{ "correo": "ana.perez@unipamplona.edu.co", "password": "1090123456" }
+
+### 2) Login de DOCENTE -> 200 con "rol": "DOCENTE"
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{ "correo": "carlos.rodriguez@unipamplona.edu.co", "password": "1094555222" }
+
+### 3) Contraseña mala -> 401
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{ "correo": "ana.perez@unipamplona.edu.co", "password": "otra" }
+
+### 4) Correo que no existe -> 401
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{ "correo": "nadie@unipamplona.edu.co", "password": "123" }

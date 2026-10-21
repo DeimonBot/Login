@@ -1,0 +1,32 @@
+/* Colores y estilos globales de toda la app */
+:root {
+  /* Paleta de la Universidad de Pamplona (sacada de unipamplona.edu.co) */
+  --primario: #ad3333;        /* rojo institucional */
+  --primario-hover: #8f2828;  /* rojo más oscuro para hover */
+  --primario-oscuro: #5e1a1a;  /* rojo profundo para la capa sobre fotos */
+  --azul: #003366;            /* azul del eslogan */
+  --dorado: #eca834;          /* dorado/naranja del eslogan */
+  --fondo: #f0f0f0;           /* gris claro de la página */
+  --superficie: #ffffff;
+  --borde: #d9d9d9;
+  --texto: #333333;
+  --texto-suave: #666666;     /* gris de "UNIVERSIDAD DE" */
+  --error: #c62828;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+}
