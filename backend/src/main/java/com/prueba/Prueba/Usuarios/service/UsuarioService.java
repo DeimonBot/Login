@@ -1,6 +1,7 @@
 package com.prueba.Prueba.Usuarios.service;
 
 import com.prueba.Prueba.Usuarios.dtos.CargaMasivaResponseDTO;
+import com.prueba.Prueba.Usuarios.dtos.CuentaCreadaDTO;
 import com.prueba.Prueba.Usuarios.dtos.ErrorFilaDTO;
 import com.prueba.Prueba.Usuarios.dtos.EstudianteCsv;
 import com.prueba.Prueba.Usuarios.entitys.Rol;
@@ -52,6 +53,7 @@ public class UsuarioService {
 
     private CargaMasivaResponseDTO procesarEstudiantes(List<EstudianteCsv> estudiantes) {
         List<ErrorFilaDTO> errores = new ArrayList<>();
+        List<CuentaCreadaDTO> cuentasCreadas = new ArrayList<>();
         int creados = 0;
         int actualizados = 0;
 
@@ -66,6 +68,8 @@ public class UsuarioService {
 
                 if (resultado.esNuevo()) {
                     creados++;
+                    Usuario u = resultado.usuario();
+                    cuentasCreadas.add(new CuentaCreadaDTO(u.getCedula(), u.getCorreo(), u.getPassword()));
                 } else {
                     actualizados++;
                 }
@@ -78,7 +82,7 @@ public class UsuarioService {
             }
         }
 
-        return construirRespuesta(creados, actualizados, errores);
+        return construirRespuesta(creados, actualizados, errores, cuentasCreadas);
     }
 
     private void validarEstudiante(EstudianteCsv dto, int numeroFila) {
@@ -97,7 +101,7 @@ public class UsuarioService {
         boolean esNuevo = usuarioExistente.isEmpty();
         Usuario usuario = esNuevo ? crearUsuario(dto) : actualizarUsuario(usuarioExistente.get(), dto);
         usuarioRepository.save(usuario);
-        return new ResultadoOperacion(esNuevo);
+        return new ResultadoOperacion(esNuevo, usuario);
     }
 
     private Usuario crearUsuario(EstudianteCsv dto) {
@@ -123,11 +127,13 @@ public class UsuarioService {
         return usuario;
     }
 
-    private CargaMasivaResponseDTO construirRespuesta(int creados, int actualizados, List<ErrorFilaDTO> errores) {
+    private CargaMasivaResponseDTO construirRespuesta(int creados, int actualizados,
+                                                      List<ErrorFilaDTO> errores,
+                                                      List<CuentaCreadaDTO> cuentasCreadas) {
         int total = creados + actualizados + errores.size();
-        return new CargaMasivaResponseDTO(total, creados, actualizados, errores.size(), errores);
+        return new CargaMasivaResponseDTO(total, creados, actualizados, errores.size(), errores, cuentasCreadas);
     }
 
     // Record interno para encapsular el resultado de la operación
-    private record ResultadoOperacion(boolean esNuevo) {}
+    private record ResultadoOperacion(boolean esNuevo, Usuario usuario) {}
 }

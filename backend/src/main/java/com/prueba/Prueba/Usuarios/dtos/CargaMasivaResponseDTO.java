@@ -7,5 +7,6 @@ public record CargaMasivaResponseDTO(
         int creados,
         int actualizados,
         int errores,
-        List<ErrorFilaDTO> erroresDetalle
+        List<ErrorFilaDTO> erroresDetalle,
+        List<CuentaCreadaDTO> cuentasCreadas
 ) {}
