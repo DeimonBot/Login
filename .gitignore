@@ -8,3 +8,5 @@ backend/data/
 frontend/node_modules/
 frontend/dist/
 frontend/.angular/
+frontend/pnpm-lock.yaml
+frontend/pnpm-workspace.yaml
