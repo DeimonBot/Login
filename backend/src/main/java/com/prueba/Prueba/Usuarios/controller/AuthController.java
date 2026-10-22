@@ -1,7 +1,12 @@
-package co.edu.unipamplona.procesosoftware.auth;
+package com.prueba.Prueba.Usuarios.controller;
 
-import java.util.Map;
 
+import com.prueba.Prueba.Usuarios.entitys.Rol;
+import com.prueba.Prueba.Usuarios.entitys.Usuario;
+import com.prueba.Prueba.Usuarios.repository.UsuarioRepository;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,26 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.edu.unipamplona.procesosoftware.usuario.Rol;
-import co.edu.unipamplona.procesosoftware.usuario.Usuario;
-import co.edu.unipamplona.procesosoftware.usuario.UsuarioRepository;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import java.util.Map;
 
-/**
- * POST /api/auth/login
- *   Body:  { "correo": "ana@unipamplona.edu.co", "password": "1090123456" }
- *   200 -> { "id": 1, "nombre": "...", "correo": "...", "carrera": "...", "rol": "ESTUDIANTE" }
- *   401 -> { "mensaje": "Correo o contraseña incorrectos." }
- *
- * Sin encriptar ni tokens por ahora (así lo pidieron). Cuando definan la
- * arquitectura se puede cambiar por Spring Security + JWT sin tocar el frontend
- * más que el servicio.
- */
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
-
     public record LoginRequest(@NotBlank String correo, @NotBlank String password) {
     }
 
@@ -36,10 +27,6 @@ public class AuthController {
     }
 
     private final UsuarioRepository repo;
-
-    public AuthController(UsuarioRepository repo) {
-        this.repo = repo;
-    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {

@@ -1,8 +1,12 @@
-# Proceso Software · Login
+# Proceso Software · Login y Carga Masiva de Usuarios
 
-Spring Boot 3.5 + H2 (backend) · Angular 21 (frontend). Sin encriptar, como pidió el profe.
-Parte de **Dana y Natanael**. La carga de cuentas desde CSV la hace el resto del grupo.
+Sistema web desarrollado con **Spring Boot (backend)** y **Angular (frontend)**, que integra el módulo de autenticación (Login) y la carga masiva de estudiantes mediante archivos CSV en base de datos en memoria **H2**.
 
+---
+
+## 📐 Arquitectura y Flujos del Sistema
+
+### 1. Autenticación (Login)
 ```
 Angular (pantalla de login)
    │  POST /api/auth/login  { correo, password }
@@ -14,155 +18,268 @@ Spring Boot ──► busca el correo en H2 y compara la contraseña
    └─ 401 { mensaje }                     ──► Angular muestra "Correo o contraseña incorrectos."
 ```
 
+### 2. Carga Masiva de Estudiantes (CSV)
+```
+Cliente / Postman / Frontend
+   │  POST /api/v1/usuarios/cargar-csv (multipart/form-data con archivo .csv)
+   ▼
+Spring Boot (UsuarioController ──► CsvParserService ──► UsuarioService)
+   │
+   ├─ Valida formato y columnas del archivo CSV (OpenCSV)
+   ├─ Valida reglas de negocio por fila (correo institucional, longitudes, etc.)
+   ├─ Si el estudiante ya existe (por cédula) ──► Actualiza sus datos
+   ├─ Si no existe ──► Crea el usuario (Rol ESTUDIANTE y contraseña: [Inicial][Cédula]*)
+   └─ Retorna 200 { totalProcesados, creados, actualizados, errores, erroresDetalle }
+```
+
 ---
 
-## 1. Qué tienen que tener instalado
+## 1. Requisitos Previos
 
-| Herramienta | Versión | Cómo verificar | Dónde se baja |
+| Herramienta | Versión recomendada | Cómo verificar | Dónde se descarga |
 |---|---|---|---|
-| JDK (Java) | 17 o más | `java -version` | adoptium.net (Temurin 21) |
-| Maven | 3.9+ (opcional si usan IntelliJ, que ya lo trae) | `mvn -v` | maven.apache.org |
-| Node.js | 20.19+, 22.12+ o 24 | `node -v` | nodejs.org (versión LTS) |
-| Editor | IntelliJ IDEA Community **o** VS Code con *Extension Pack for Java* | — | — |
-| Git | cualquiera reciente | `git --version` | git-scm.com |
+| **JDK (Java)** | **21** | `java -version` | [adoptium.net](https://adoptium.net/) (Temurin 21) |
+| **Maven Wrapper** | Incluido en el repo (`./mvnw`) | `./mvnw -v` | No requiere instalación |
+| **Node.js** | 20.19+, 22.12+ o 24 (LTS) | `node -v` | [nodejs.org](https://nodejs.org/) |
+| **Editor / IDE** | IntelliJ IDEA Community **o** VS Code | — | — |
+| **Git** | Versión reciente | `git --version` | [git-scm.com](https://git-scm.com/) |
 
-No hace falta instalar Angular CLI ni ninguna base de datos: H2 viene dentro del backend.
+> [!NOTE]
+> No es necesario instalar una base de datos externa ni Maven global: H2 corre en memoria y el backend incluye el Maven Wrapper (`mvnw`).
 
 ---
 
-## 2. Paso a paso para correrlo
+## 2. Paso a Paso para Ejecutar el Proyecto
 
 ### Paso 1 — Backend (Spring Boot)
 
-**IntelliJ:** `File → Open…` → carpeta **`backend`** → esperar a que descargue dependencias →
-abrir `ProcesoSoftwareApplication.java` → ▶ verde al lado de `main`.
+**Opción A — IntelliJ IDEA:**
+1. `File → Open…` → seleccionar la carpeta **`backend`**.
+2. Esperar a que descargue dependencias Maven.
+3. Abrir `PruebaUsuariosApplication.java` (`com.prueba.Prueba.Usuarios`).
+4. Clic en el botón ▶ (*Run*) al lado del método `main`.
 
-**Terminal:**
+**Opción B — Terminal:**
 ```bash
 cd backend
-mvn spring-boot:run
+
+# En Linux / macOS:
+chmod +x mvnw
+./mvnw spring-boot:run
+
+# En Windows (CMD o PowerShell):
+mvnw.cmd spring-boot:run
 ```
-✅ En la consola sale `Tomcat started on port 8080`.
+✅ La consola mostrará que el servidor inició en el puerto **8080**.
+
+---
 
 ### Paso 2 — Frontend (Angular)
 
 En **otra** terminal:
 ```bash
 cd frontend
-npm install      # solo la primera vez
+npm install      # Solo la primera vez
 npm start
 ```
-✅ Abrir <http://localhost:4200> → sale la pantalla de login.
+✅ Abrir en el navegador: <http://localhost:4200> para ver la pantalla de login.
 
-### Paso 3 — Probar
+---
 
-Al arrancar, el backend crea **dos cuentas de prueba**, una de cada rol (archivo `datos/DatosDePrueba.java`):
+### Paso 3 — Probar el Sistema
 
-| Rol | Correo | Contraseña |
-|---|---|---|
-| Estudiante | `ana.perez@unipamplona.edu.co` | `1090123456` |
-| Docente | `carlos.rodriguez@unipamplona.edu.co` | `1094555222` |
+#### Cuentas de prueba predeterminadas (`DatosDePrueba.java`)
 
+Al arrancar, el backend registra dos usuarios semilla. La contraseña por defecto sigue el patrón:  
+**`[Primera letra del nombre en mayúscula][Cédula]*`**
+
+| Rol | Nombre | Correo | Contraseña |
+|---|---|---|---|
+| **Estudiante** | Ana Perez | `ana.perez@unipamplona.edu.co` | `A1090123456*` |
+| **Docente** | Carlos Rodríguez | `carlos.rodriguez@unipamplona.edu.co` | `C1094555222*` |
+
+#### Casos de prueba en el Login:
 | Prueba | Resultado esperado |
 |---|---|
-| Dar "Entrar" con los campos vacíos | Mensajes rojos debajo de cada campo |
-| Correo bien, contraseña mala | "Correo o contraseña incorrectos." |
-| Entrar con Ana | `/inicio` dice "Ingresaste como **estudiante**" (aviso rojo) |
-| Entrar con Carlos | `/inicio` dice "Ingresaste como **docente**" (aviso azul) |
-| Recargar la página estando adentro | Sigue con la sesión |
-| "Cerrar sesión" | Vuelve al login |
-| Escribir `localhost:4200/inicio` sin sesión | Lo devuelve al login |
+| Enviar formulario vacío | Mensajes de validación en rojo debajo de cada campo |
+| Correo válido, contraseña incorrecta | Mensaje: *"Correo o contraseña incorrectos."* |
+| Iniciar sesión con Ana | Redirección a `/inicio` indicando rol **estudiante** |
+| Iniciar sesión con Carlos | Redirección a `/inicio` indicando rol **docente** |
+| Recargar la página | Mantiene la sesión activa |
+| Cerrar sesión | Limpia el almacenamiento y redirige al login |
+| Acceder a `/inicio` sin autenticación | Bloqueado por el guard y redirigido a `/login` |
 
-**Probar el backend solo:** abrir `backend/pruebas.http` en IntelliJ o VS Code (extensión *REST Client*) → *Send Request*.
-
-**Ver la base de datos:** <http://localhost:8080/h2-console> → JDBC URL `jdbc:h2:mem:procesodb`, usuario `sa`, sin contraseña → `SELECT * FROM USUARIOS;`
-
----
-
-## 3. Endpoint
-
-| Método | Ruta | Envía | Responde |
-|---|---|---|---|
-| `POST` | `/api/auth/login` | JSON `{ "correo", "password" }` | `200` `{ id, nombre, correo, carrera, rol }` (rol = `"ESTUDIANTE"` o `"DOCENTE"`) · `401` `{ "mensaje": "Correo o contraseña incorrectos." }` |
+#### Base de Datos H2:
+- Consola web: <http://localhost:8080/h2-console>
+- **JDBC URL:** `jdbc:h2:mem:trabajoSocial`
+- **Usuario:** `sa`
+- **Contraseña:** *(vacía)*
+- Consulta de verificación: `SELECT * FROM USUARIOS;`
 
 ---
 
-## 4. Qué hace cada archivo
+## 3. Endpoints del API REST
 
-### Backend (`backend/src/main/java/co/edu/unipamplona/procesosoftware/`)
+### 1. Autenticación (`AuthController`)
 
-| Archivo | Qué hace |
+- **Ruta:** `POST /api/auth/login`
+- **Headers:** `Content-Type: application/json`
+- **Cuerpo de la petición:**
+```json
+{
+  "correo": "ana.perez@unipamplona.edu.co",
+  "password": "A1090123456*"
+}
+```
+- **Respuesta Exitosa (`200 OK`):**
+```json
+{
+  "id": 1,
+  "nombre": "Ana",
+  "correo": "ana.perez@unipamplona.edu.co",
+  "carrera": "Derecho",
+  "rol": "ESTUDIANTE"
+}
+```
+- **Respuesta de Error (`401 Unauthorized`):**
+```json
+{
+  "mensaje": "Correo o contraseña incorrectos."
+}
+```
+
+---
+
+### 2. Carga Masiva de Estudiantes (`UsuarioController`)
+
+- **Ruta:** `POST /api/v1/usuarios/cargar-csv`
+- **Headers:** `Content-Type: multipart/form-data`
+- **Parámetro del form-data:**
+  - `archivo`: Archivo con extensión `.csv` (ejemplo disponible en la raíz del proyecto: `datos.csv`).
+- **Respuesta Exitosa (`200 OK`):**
+```json
+{
+  "totalProcesados": 30,
+  "creados": 30,
+  "actualizados": 0,
+  "errores": 0,
+  "erroresDetalle": []
+}
+```
+- **Si se presentan filas con errores de validación:**
+```json
+{
+  "totalProcesados": 3,
+  "creados": 2,
+  "actualizados": 0,
+  "errores": 1,
+  "erroresDetalle": [
+    {
+      "numeroFila": 3,
+      "campo": "validacion",
+      "mensaje": "correo: Debe utilizar un correo universitario"
+    }
+  ]
+}
+```
+
+---
+
+## 4. Estructura y Reglas del Archivo CSV
+
+El archivo CSV debe tener codificación UTF-8, encabezado en la primera línea y contener 6 columnas obligatorias:
+
+```csv
+nombre,apellido,cc,correo,telefono,carrera
+Juan,Perez,1098765432,juan.perez@unipamplona.edu.co,3101234567,Ingeniería de Sistemas
+Maria,Gomez,1087654321,maria.gomez@unipamplona.edu.co,3201234567,Ingeniería Civil
+```
+
+### Validaciones aplicadas por fila:
+- **`nombre`**: Obligatorio, máximo 20 caracteres.
+- **`apellido`**: Obligatorio, máximo 20 caracteres.
+- **`cc` (cédula)**: Obligatoria, máximo 10 caracteres, única.
+- **`correo`**: Obligatorio, formato válido con dominio institucional obligatorio (`@unipamplona.edu.co`).
+- **`telefono`**: Obligatorio, exactamente 10 dígitos.
+- **`carrera`**: Obligatoria, máximo 50 caracteres.
+
+### Reglas de negocio en la carga:
+1. **Actualización automática**: Si la cédula ya existe en la base de datos, se actualizan sus datos personales (`nombre`, `apellido`, `correo`, `telefono`, `carrera`).
+2. **Creación de nuevos usuarios**: Si la cédula no existe, se registra con el rol `ESTUDIANTE` y contraseña generada automáticamente (`[Inicial][Cédula]*`).
+3. **Manejo de errores por fila**: Una fila con error no interrumpe el procesamiento del resto del archivo; se reporta detalladamente en `erroresDetalle`.
+
+---
+
+## 5. Estructura del Proyecto
+
+### Backend (`backend/src/main/java/com/prueba/Prueba/Usuarios/`)
+
+| Paquete / Archivo | Responsabilidad |
 |---|---|
-| `auth/AuthController.java` | El endpoint `/api/auth/login` |
-| `usuario/Usuario.java` | La tabla `usuarios`. **La comparte con el equipo del CSV** |
-| `usuario/Rol.java` | Los roles: `ESTUDIANTE` y `DOCENTE` |
-| `usuario/UsuarioRepository.java` | Consultas a la BD (`findByCorreoIgnoreCase`, `findByCedula`). **La comparte con el equipo del CSV** |
-| `datos/DatosDePrueba.java` | Crea 2 cuentas al arrancar. **Se borra cuando se integre el CSV** |
-| `config/CorsConfig.java` | Deja que Angular (puerto 4200) le hable a Spring (8080) |
-| `resources/application.properties` | Configuración de H2 y del servidor |
+| `PruebaUsuariosApplication.java` | Clase principal que inicia el backend Spring Boot |
+| `config/CorsConfig.java` | Configuración de CORS para permitir peticiones desde `http://localhost:4200` |
+| `controller/AuthController.java` | Endpoint `/api/auth/login` para autenticación |
+| `controller/UsuarioController.java` | Endpoint `/api/v1/usuarios/cargar-csv` para carga masiva |
+| `service/CsvParserService.java` | Lectura y parseo del CSV usando OpenCSV |
+| `service/UsuarioService.java` | Validación de datos, guardado y actualización de estudiantes |
+| `dtos/EstudianteCsv.java` | DTO con validaciones Jakarta (`@Email`, `@Pattern`, `@Size`) |
+| `dtos/CargaMasivaResponseDTO.java` | Estructura de respuesta resumen de la carga masiva |
+| `dtos/ErrorFilaDTO.java` | Estructura de reporte de errores específicos por fila |
+| `entitys/Usuario.java` | Entidad JPA mapeada a la tabla `usuarios` |
+| `entitys/Rol.java` | Enumeración de roles (`ESTUDIANTE`, `DOCENTE`) |
+| `repository/UsuarioRepository.java` | Métodos de consulta (`findByCorreoIgnoreCase`, `findByCedula`) |
+| `exception/GlobalExceptionHandler.java` | Manejo centralizado de excepciones y respuestas HTTP de error |
+| `data/DatosDePrueba.java` | Semilla inicial de usuarios para pruebas locales |
+| `resources/application.properties` | Configuración de H2, puerto del servidor y Hibernate |
 
 ### Frontend (`frontend/src/app/`)
 
-| Archivo | Qué hace |
+| Archivo / Carpeta | Responsabilidad |
 |---|---|
-| `core/auth.service.ts` | Llama al backend, guarda quién inició sesión y cierra sesión |
-| `core/auth.guard.ts` | Bloquea las rutas privadas si no hay sesión |
-| `core/api.ts` | URL del backend, el tipo `Rol` y el tipo `UsuarioSesion` |
-| `shared/escudo/` | Escudo + nombre de la universidad (grande en el login, pequeño en la barra) |
-| `core/errores.ts` | Convierte errores HTTP en mensajes entendibles |
-| `pages/login/` | Pantalla de login (formulario reactivo con validaciones) |
-| `pages/inicio/` | Pantalla después de entrar: "Ingresaste como estudiante/docente" + cerrar sesión |
-| `app.routes.ts` | Rutas: `/login` (pública) e `/inicio` (protegida) |
+| `core/auth.service.ts` | Gestión de sesión (login, logout, almacenamiento local) |
+| `core/auth.guard.ts` | Protección de rutas privadas (`canActivate`) |
+| `core/api.ts` | Configuración de endpoints y contratos de tipos |
+| `core/errores.ts` | Transformación de errores HTTP a mensajes amigables |
+| `shared/escudo/` | Componente reutilizable del escudo institucional |
+| `pages/login/` | Pantalla y formulario reactivo de inicio de sesión |
+| `pages/inicio/` | Pantalla posterior al login según el rol del usuario |
+| `app.routes.ts` | Configuración de rutas públicas y privadas |
 
 ---
 
-## 5. Lo que hay que acordar con el equipo del CSV
+## 6. Solución a Problemas Comunes
 
-| Tema | Cómo lo espera el login |
-|---|---|
-| Entidad | Usar la misma `Usuario.java`: `nombre, cedula, correo, telefono, carrera, rol, password` |
-| Rol | Si no le ponen rol, la cuenta queda como `ESTUDIANTE`. Para crear docentes desde el CSV: agregar una columna `rol` y hacer `u.setRol(Rol.DOCENTE)` |
-| Correo | Único y guardado en minúsculas (el login busca sin distinguir mayúsculas) |
-| Contraseña | El CSV no trae contraseña, así que la inicial es la **cédula** (`u.setPassword(cedula)`) |
-| Al integrar | Ellos agregan su servicio y controlador; se borra `DatosDePrueba.java` |
-| Para proteger otras pantallas | En `app.routes.ts`: `{ path: 'x', component: X, canActivate: [authGuard] }` |
-
----
-
-## 6. Problemas comunes
-
-| Síntoma | Causa | Solución |
+| Síntoma | Posible causa | Solución |
 |---|---|---|
-| *"No hay conexión con el servidor"* en el login | El backend no está corriendo | Paso 1 |
-| Error de **CORS** en la consola del navegador | Angular corre en un puerto distinto de 4200 | Agregar ese origen en `CorsConfig.java` |
-| `Port 8080 was already in use` | Otro programa usa el puerto | Cerrarlo o cambiar `server.port` (y `API_URL` en `core/api.ts`) |
-| `npm install` falla con *"reading 'edgesOut'"* | Bug de npm 10 | `npx npm@11 install` |
-| *"The Angular CLI requires a minimum Node.js version"* | Node viejo | Instalar Node LTS |
-| `release version 17 not supported` | JDK más viejo que 17 | Instalar JDK 17 o 21 |
+| *"No hay conexión con el servidor"* | El backend no está iniciado | Iniciar el backend en el puerto 8080 (ver Paso 1) |
+| Error de **CORS** en el navegador | Angular está corriendo en un puerto diferente a 4200 | Ajustar el origen permitido en `CorsConfig.java` |
+| `Port 8080 was already in use` | Otro proceso tiene tomado el puerto 8080 | Detener el proceso previo o cambiar `server.port` en `application.properties` (y `API_URL` en `frontend/.../api.ts`) |
+| Permiso denegado al ejecutar `./mvnw` | Falta permiso de ejecución en Linux/macOS | Ejecutar `chmod +x backend/mvnw` |
+| `release version 21 not supported` | Se está usando una versión de Java inferior a 21 | Instalar y configurar JDK 21 (Temurin) |
+| `npm install` falla | Versión de Node desactualizada | Usar Node.js versión LTS (20 o 22) |
 
 ---
 
-## 7. Trabajar con Git (para el equipo)
+## 7. Flujo de Trabajo con Git
 
-### Bajar el proyecto por primera vez
+### Clonar y preparar el entorno
 ```bash
 git clone <URL-del-repositorio>
 cd <carpeta-del-repositorio>
+
+# Configurar permisos del wrapper
+chmod +x backend/mvnw
+
+# Instalar dependencias del frontend
 cd frontend
 npm install
 ```
-Luego seguir la sección 2 (backend en IntelliJ abriendo la carpeta `backend`, y `npm start` en `frontend`).
 
-> `node_modules`, `target`, `dist` y `.angular` **no se suben** al repo (están en `.gitignore`).
-> Por eso, después de clonar, siempre hay que correr `npm install` en `frontend`.
-
-### Día a día
-| Quiero… | Comando |
-|---|---|
-| Traer lo último que subieron los demás | `git pull` |
-| Ver qué archivos cambié | `git status` |
-| Guardar mis cambios | `git add .` y luego `git commit -m "Qué hice"` |
-| Subirlos | `git push` |
-
-Antes de empezar a trabajar: `git pull`. Antes de subir: `git pull` y luego `git push`.
-
+### Comandos frecuentes
+```bash
+git pull                   # Descargar últimos cambios
+git status                 # Ver archivos modificados y sin seguimiento
+git add .                  # Preparar cambios para commit
+git commit -m "mensaje"    # Registrar cambios con mensaje descriptivo
+git push                   # Subir cambios al repositorio
+```

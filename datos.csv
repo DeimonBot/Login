@@ -1,0 +1,31 @@
+nombre,apellido,cc,correo,telefono,carrera
+Juan,Perez,1098765432,juan.perez@unipamplona.edu.co,3101234567,Ingeniería de Sistemas
+Maria,Gomez,1087654321,maria.gomez@unipamplona.edu.co,3201234567,Ingeniería Civil
+Carlos,Ruiz,1076543210,carlos.ruiz@unipamplona.edu.co,3151234567,Administración de Empresas
+Ana,Torres,1065432109,ana.torres@unipamplona.edu.co,3001234567,Contaduría Pública
+Luis,Martinez,1054321098,luis.martinez@unipamplona.edu.co,3112345678,Derecho
+Sofia,Rodriguez,1043210987,sofia.rodriguez@unipamplona.edu.co,3222345678,Medicina
+Diego,Hernandez,1032109876,diego.hernandez@unipamplona.edu.co,3133456789,Arquitectura
+Valentina,Lopez,1021098765,valentina.lopez@unipamplona.edu.co,3014567890,Psicología
+Andres,Garcia,1010987654,andres.garcia@unipamplona.edu.co,3145678901,Ingeniería Industrial
+Camila,Sanchez,1009876543,camila.sanchez@unipamplona.edu.co,3236789012,Comunicación Social
+Mateo,Ramirez,1098123456,mateo.ramirez@unipamplona.edu.co,3127890123,Economía
+Isabella,Flores,1087234567,isabella.flores@unipamplona.edu.co,3028901234,Ingeniería Electrónica
+Santiago,Vargas,1076345678,santiago.vargas@unipamplona.edu.co,3169012345,Ingeniería Mecánica
+Luciana,Mendoza,1065456789,luciana.mendoza@unipamplona.edu.co,3240123456,Odontología
+Sebastian,Castro,1054567890,sebastian.castro@unipamplona.edu.co,3171234567,Enfermería
+Daniela,Rojas,1043678901,daniela.rojas@unipamplona.edu.co,3032345678,Trabajo Social
+Nicolas,Acosta,1032789012,nicolas.acosta@unipamplona.edu.co,3183456789,Biología
+Mariana,Beltran,1021890123,mariana.beltran@unipamplona.edu.co,3254567890,Matemáticas
+Alejandro,Ortiz,1010901234,alejandro.ortiz@unipamplona.edu.co,3195678901,Física
+Gabriela,Salazar,1009012345,gabriela.salazar@unipamplona.edu.co,3046789012,Química
+Felipe,Moreno,1098123457,felipe.moreno@unipamplona.edu.co,3106789012,Historia
+Laura,Jimenez,1087234568,laura.jimenez@unipamplona.edu.co,3217890123,Filosofía
+David,Silva,1076345679,david.silva@unipamplona.edu.co,3128901234,Inglés
+Paula,Herrera,1065456790,paula.herrera@unipamplona.edu.co,3039012345,Literatura
+Javier,Morales,1054567891,javier.morales@unipamplona.edu.co,3140123456,Música
+Natalia,Reyes,1043678902,natalia.reyes@unipamplona.edu.co,3251234567,Artes Plásticas
+Oscar,Medina,1032789013,oscar.medina@unipamplona.edu.co,3162345678,Educación Física
+Andrea,Delgado,1021890124,andrea.delgado@unipamplona.edu.co,3073456789,Ciencias Políticas
+Ricardo,Aguilar,1010901235,ricardo.aguilar@unipamplona.edu.co,3184567890,Ingeniería Ambiental
+Carolina,Paredes,1009012346,carolina.paredes@unipamplona.edu.co,3295678901,Zootecnia
