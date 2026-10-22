@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { NOMBRE_ROL } from '../../core/api';
 import { AuthService } from '../../core/auth.service';
 import { Escudo } from '../../shared/escudo/escudo';
+import { DocenteCarga } from './docente-carga/docente-carga';
 
 /** Página que se ve después de iniciar sesión (la ruta está protegida con authGuard). */
 @Component({
   selector: 'app-inicio',
-  imports: [Escudo],
+  imports: [Escudo, DocenteCarga],
   templateUrl: './inicio.html',
   styleUrl: './inicio.css',
 })

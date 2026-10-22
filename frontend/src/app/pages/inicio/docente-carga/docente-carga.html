@@ -1,0 +1,387 @@
+<div class="panel-docente">
+  <!-- Encabezado del módulo -->
+  <header class="panel-header">
+    <div class="badge-docente">
+      <svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 4h18v12H3z M8 20l2-4 M16 20l-2-4 M7 9h6 M7 12h9" />
+      </svg>
+      <span>Docente</span>
+    </div>
+    <h1 class="panel-titulo">Crear cuentas estudiantes por lote</h1>
+    <p class="panel-subtitulo">
+      Bienvenido(a), <strong>{{ docente().nombre }}</strong>. Puedes registrar múltiples estudiantes cargando un archivo CSV.
+    </p>
+  </header>
+
+  <!-- Contenedor principal con dos columnas y divisor vertical -->
+  <div class="panel-cuerpo">
+    <!-- COLUMNA IZQUIERDA: Plantilla y Bloque de Código CSV -->
+    <section class="columna-izquierda">
+      <div class="accion-plantilla">
+        <a href="plantilla.csv" download="plantilla_estudiantes.csv" class="btn-descarga">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          <span>Descargar Plantilla CSV</span>
+        </a>
+      </div>
+
+      <!-- Ventana estilo código / editor para el formato del CSV -->
+      <div class="ventana-codigo">
+        <div class="ventana-codigo-header">
+          <div class="ventana-archivo">
+            <svg class="archivo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            <span>plantilla_estudiantes.csv</span>
+          </div>
+          <button type="button" class="btn-copiar-codigo" (click)="copiarTextoEjemplo()" title="Copiar contenido de ejemplo">
+            @if (ejemploCopiado()) {
+              <svg class="mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Copiado</span>
+            } @else {
+              <svg class="mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              <span>Copiar</span>
+            }
+          </button>
+        </div>
+
+        <div class="codigo-scroll">
+          <pre class="codigo-pre"><code>@for (linea of lineasCsv; track linea.num) {<div class="linea-codigo" [class.linea-header]="linea.esHeader"><span class="linea-num">{{ linea.num }}</span><span class="linea-texto">{{ linea.texto }}</span></div>}</code></pre>
+        </div>
+      </div>
+
+      <!-- Guía de especificaciones con iconos profesionales -->
+      <div class="guia-reglas">
+        <div class="regla-item">
+          <svg class="check-regla-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <div>
+            <strong>6 columnas obligatorias:</strong>
+            <code>nombre, apellido, cc, correo, telefono, carrera</code>
+          </div>
+        </div>
+
+        <div class="regla-item">
+          <svg class="check-regla-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <div>
+            <strong>Correo institucional:</strong> Dominio obligatorio <code>&#64;unipamplona.edu.co</code>
+          </div>
+        </div>
+
+        <div class="regla-item">
+          <svg class="check-regla-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <div>
+            <strong>Contraseña automática:</strong>
+            <code>[Inicial Nombre][Cédula]*</code> (ej. <code>A1090123456*</code>)
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIVISOR VERTICAL -->
+    <div class="divisor-vertical" aria-hidden="true"></div>
+
+    <!-- COLUMNA DERECHA: Subida de archivo, Cuentas generadas y Errores (sin tablas) -->
+    <section class="columna-derecha">
+      <!-- Botones de Acción -->
+      <div class="acciones-carga">
+        <input
+          #fileInput
+          type="file"
+          accept=".csv"
+          (change)="onArchivoSeleccionado($event)"
+          class="input-file-oculto"
+          id="archivoCsvInput"
+        />
+
+        <button type="button" class="btn-subir" (click)="fileInput.click()" [disabled]="estaCargando()">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <span>Subir CSV</span>
+        </button>
+
+        <button
+          type="button"
+          class="btn-crear"
+          (click)="crearCuentas()"
+          [disabled]="!archivoSeleccionado() || estaCargando()"
+        >
+          @if (estaCargando()) {
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Procesando...</span>
+          } @else {
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="8.5" cy="7" r="4" />
+              <line x1="20" y1="8" x2="20" y2="14" />
+              <line x1="23" y1="11" x2="17" y2="11" />
+            </svg>
+            <span>Crear Cuentas</span>
+          }
+        </button>
+      </div>
+
+      <!-- Chip del archivo seleccionado con icono profesional -->
+      @if (archivoSeleccionado(); as arch) {
+        <div class="archivo-chip">
+          <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          <span class="chip-nombre">{{ arch.name }}</span>
+          <span class="chip-tamano">({{ formatearTamano(arch.size) }})</span>
+          <button type="button" class="chip-cerrar" (click)="quitarArchivo(fileInput)" title="Quitar archivo">
+            <svg class="chip-close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+      }
+
+      <!-- PESTAÑAS: Cuentas y Errores -->
+      <div class="tabs-barra">
+        <button
+          type="button"
+          class="tab-btn"
+          [class.activo]="pestanaActiva() === 'cuentas'"
+          (click)="pestanaActiva.set('cuentas')"
+        >
+          <span>Cuentas</span>
+          @if (respuesta(); as r) {
+            <span class="tab-badge" [class.badge-creados]="r.creados > 0">{{ r.creados }}</span>
+          }
+        </button>
+
+        <button
+          type="button"
+          class="tab-btn"
+          [class.activo]="pestanaActiva() === 'errores'"
+          (click)="pestanaActiva.set('errores')"
+        >
+          <span>Errores</span>
+          @if (respuesta(); as r) {
+            <span class="tab-badge" [class.badge-errores]="r.errores > 0">{{ r.errores }}</span>
+          }
+        </button>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- CONTENIDO PESTAÑA: CUENTAS (VISTA EN LISTA/TARJETAS, SIN TABLAS) -->
+      <!-- ============================================== -->
+      @if (pestanaActiva() === 'cuentas') {
+        <div class="tab-contenido">
+          @if (respuesta(); as r) {
+            <div class="resumen-barra">
+              <div class="linea-total">
+                <span class="total-destacado">Cuentas creadas = {{ r.creados }}</span>
+                @if (r.actualizados > 0) {
+                  <span class="total-actualizados">Actualizados = {{ r.actualizados }}</span>
+                }
+              </div>
+            </div>
+
+            @if (r.cuentasCreadas && r.cuentasCreadas.length > 0) {
+              <!-- Buscador con icono SVG -->
+              <div class="buscador-caja">
+                <svg class="buscador-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Buscar por cédula o correo..."
+                  [ngModel]="filtroBusqueda()"
+                  (ngModelChange)="filtroBusqueda.set($event)"
+                  class="input-buscador"
+                />
+              </div>
+
+              <!-- Lista de Credenciales de Cuentas (Sin tablas) -->
+              <div class="lista-cuentas-scroll">
+                @for (cuenta of cuentasFiltradas(); track cuenta.cedula) {
+                  <div class="tarjeta-cuenta">
+                    <div class="cuenta-usuario">
+                      <div class="cuenta-avatar" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                      </div>
+                      <div class="cuenta-detalles">
+                        <div class="cuenta-cedula">CC: {{ cuenta.cedula }}</div>
+                        <div class="cuenta-correo">{{ cuenta.correo }}</div>
+                      </div>
+                    </div>
+
+                    <div class="cuenta-password-box">
+                      <span class="password-label">Contraseña:</span>
+                      <code class="password-codigo">{{ cuenta.password }}</code>
+                      @if (cuenta.password) {
+                        <button
+                          type="button"
+                          class="btn-copiar-pass"
+                          (click)="copiarAlPortapapeles(cuenta.password)"
+                          [title]="passwordCopiada() === cuenta.password ? 'Copiado' : 'Copiar contraseña'"
+                        >
+                          @if (passwordCopiada() === cuenta.password) {
+                            <svg class="mini-icon icono-verde" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          } @else {
+                            <svg class="mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                          }
+                        </button>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else if (r.creados > 0) {
+              <div class="aviso-exito-sin-lista">
+                <svg class="aviso-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+                <div>
+                  <p>Se crearon exitosamente <strong>{{ r.creados }} cuentas</strong>.</p>
+                  <p class="nota-pass">
+                    Contraseña por defecto: inicial del nombre en mayúscula + cédula + asterisco (ej. <code>A1090123456*</code>).
+                  </p>
+                </div>
+              </div>
+            } @else {
+              <div class="estado-vacio">
+                <p>No se crearon cuentas nuevas en este lote (fueron actualizadas o se presentaron errores).</p>
+              </div>
+            }
+          } @else {
+            <!-- Estado Inicial Sin Archivo Procesado (Sin emojis) -->
+            <div class="estado-inicial">
+              <div class="circulo-icono-inicial" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                  <polyline points="10 9 9 9 8 9" />
+                </svg>
+              </div>
+              <h3 class="estado-titulo">Ningún archivo procesado aún</h3>
+              <p class="estado-desc">Selecciona un archivo CSV y pulsa <strong>"Crear Cuentas"</strong> para registrar a los estudiantes.</p>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- ============================================== -->
+      <!-- CONTENIDO PESTAÑA: ERRORES (SIN TABLAS) -->
+      <!-- ============================================== -->
+      @if (pestanaActiva() === 'errores') {
+        <div class="tab-contenido">
+          @if (respuesta(); as r) {
+            <div class="resumen-barra">
+              <div class="linea-total-errores">
+                <span class="total-destacado-errores" [class.hay-errores]="r.errores > 0">
+                  Errores = {{ r.errores }}
+                </span>
+                <span class="subtitulo-errores">Lista de errores</span>
+              </div>
+            </div>
+
+            @if (r.errores > 0 && r.erroresDetalle.length > 0) {
+              <div class="lista-errores-scroll">
+                @for (err of r.erroresDetalle; track $index) {
+                  <div class="tarjeta-error">
+                    <div class="error-header">
+                      <span class="error-fila-tag">Fila {{ err.numeroFila }}</span>
+                      <span class="error-campo-tag">{{ err.campo }}</span>
+                    </div>
+                    <p class="error-mensaje">{{ err.mensaje }}</p>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="estado-exito-errores">
+                <div class="circulo-icono-exito" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <h3 class="estado-titulo">Sin inconsistencias</h3>
+                <p class="estado-desc">Todas las filas del archivo cumplen con las validaciones institucionales.</p>
+              </div>
+            }
+          } @else {
+            <div class="estado-inicial">
+              <div class="circulo-icono-inicial" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <polyline points="9 12 11 14 15 10" />
+                </svg>
+              </div>
+              <h3 class="estado-titulo">Sin errores reportados</h3>
+              <p class="estado-desc">Aquí se listarán los detalles de las filas que presenten inconsistencias.</p>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- MODAL NOTIFICANDO EL ERROR (Sin emojis) -->
+<!-- ============================================== -->
+@if (modalError().visible) {
+  <div class="modal-backdrop" (click)="cerrarModal()" role="dialog" aria-modal="true">
+    <div class="modal-caja" (click)="$event.stopPropagation()">
+      <div class="modal-cabecera">
+        <div class="modal-icono-alerta" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+        </div>
+        <h2 class="modal-titulo">{{ modalError().titulo }}</h2>
+        <button type="button" class="modal-btn-cerrar" (click)="cerrarModal()" title="Cerrar modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-cuerpo">
+        <p class="modal-mensaje">{{ modalError().mensaje }}</p>
+      </div>
+
+      <div class="modal-pie">
+        <button type="button" class="modal-btn-aceptar" (click)="cerrarModal()">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+}
